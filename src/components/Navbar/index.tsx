@@ -16,7 +16,7 @@ const route = [
   },
   {
     path: "/",
-    label: "Top Product",
+    label: "Cart",
   },
   {
     path: "/",
@@ -40,7 +40,11 @@ const Navbar = () => {
       >
         PiShopp
       </motion.h1>
-      {location.pathname === "/profile" ? (
+      {location.pathname === "/profile" ||
+      location.pathname === "/profile/cart" ||
+      location.pathname === "/profile/transaction" ||
+      location.pathname === "/profile/dashboard" ||
+      location.pathname === "/profile/report" ? (
         authContext?.user ? (
           <div className="flex gap-3 items-center">
             <IoHomeSharp
@@ -72,34 +76,8 @@ const Navbar = () => {
         )
       ) : (
         <div className="flex items-center gap-3">
-          <button
-            className="flex flex-col items-center gap-1 lg:hidden"
-            type="button"
-            onClick={() => setIsOpen((prev) => !prev)}
-            aria-label="Hamburger"
-          >
-            <span
-              className={`bg-black h-[3px] origin-top-left transition-all duration-300 ${
-                isOpen ? " w-[21px] rotate-45" : "w-6"
-              }`}
-            ></span>
-            <span
-              className={`w-6 bg-black h-[3px] transition-all duration-300 ${
-                isOpen ? "scale-0" : null
-              }`}
-            ></span>
-            <span
-              className={`bg-black h-[3px] origin-bottom-left transition-all duration-300 ${
-                isOpen ? "w-[21px] -rotate-45" : "w-6"
-              }`}
-            ></span>
-          </button>
           <nav
-            className={`${
-              isOpen
-                ? "absolute block top-12 z-10 w-40 rounded-lg py-3  right-12 bg-white shadow-xl"
-                : "hidden"
-            } lg:block`}
+            className={`fixed bottom-0 left-0 w-full flex justify-center items-center py-4 lg:p-0 lg:static lg:block bg-blue-400`}
           >
             <ul
               className={`flex items-center ${

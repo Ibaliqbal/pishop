@@ -2,7 +2,7 @@ import React, { useState, useContext } from "react";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
-import { dataUser } from "@/types/dataUser.type";
+import { dataUser } from "@/types/data.type";
 import { Link } from "react-router-dom";
 import { AuthContext } from "@/context/auth.context";
 import { toast } from "sonner";
@@ -54,7 +54,7 @@ const FormRegister = () => {
       className="flex items-center gap-4 signin p-8 rounded-md"
       initial={{ opacity: 0.5, scale: 0 }}
       animate={{ opacity: 1, scale: 1 }}
-      transition={{ duration: 2, type: "spring", stiffness: 100 }}
+      transition={{ duration: 2, type: "spring", stiffness: 50 }}
     >
       <img
         src={RegistImg}
@@ -63,19 +63,22 @@ const FormRegister = () => {
         className="md:block hidden"
       />
       <form
-        className="w-[400px] py-6 flex flex-col gap-5 items-center"
+        className="w-[400px] py-6 flex flex-col gap-5 items-center text-white"
         onSubmit={handleCreate}
       >
         <h1 className="font-bold text-xl">Register</h1>
         {inputsRegis.map((input, i) => {
           return (
             <div className="w-[75%] grid gap-2" key={i}>
-              <Label htmlFor={input.name}>{input.label}</Label>
+              <Label htmlFor={input.name} className="">
+                {input.label}
+              </Label>
               <Input
                 placeholder={input.placeholder}
                 type={input.type}
                 id={input.name}
                 name={input.name}
+                className="text-black"
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                   setData({ ...data, [e.target.id]: e.target.value })
                 }
@@ -84,7 +87,7 @@ const FormRegister = () => {
           );
         })}
         {authContext?.loading ? (
-          <Button disabled className="text-white cursor-not-allowed">
+          <Button disabled>
             <AiOutlineReload className="mr-2 w-4 h-4 animate-spin" />
             Please wait
           </Button>
@@ -97,7 +100,7 @@ const FormRegister = () => {
           <p>Do you already have an account?</p>
           <Link
             to={"/login"}
-            className="text-blue-900 underline underline-offset-8"
+            className="text-blue-500 underline underline-offset-8"
           >
             SignIn
           </Link>

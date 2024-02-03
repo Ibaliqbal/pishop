@@ -51,11 +51,11 @@ const FormLogin = () => {
       className="flex items-center gap-4 signin p-6 rounded-md"
       initial={{ opacity: 0.5, scale: 0 }}
       animate={{ opacity: 1, scale: 1 }}
-      transition={{ duration: 2, type: "spring", stiffness: 100 }}
+      transition={{ duration: 2, type: "spring", stiffness: 50 }}
     >
       <img src={LoginImg} alt="Login" width={300} className="md:block hidden" />
       <form
-        className="w-[400px] py-6 flex flex-col gap-5 items-center"
+        className="w-[400px] py-6 flex flex-col gap-5 items-center text-white"
         onSubmit={handleLogin}
       >
         <h1 className="font-bold text-xl">SignIn</h1>
@@ -68,6 +68,7 @@ const FormLogin = () => {
                 type={input.type}
                 id={input.name}
                 name={input.name}
+                className="text-black"
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                   setData({ ...data, [e.target.id]: e.target.value })
                 }
@@ -76,20 +77,18 @@ const FormLogin = () => {
           );
         })}
         {authContext?.loading ? (
-          <Button disabled className="text-white cursor-not-allowed">
+          <Button disabled>
             <AiOutlineReload className="mr-2 w-4 h-4 animate-spin" />
             Please wait
           </Button>
         ) : (
-          <Button type="submit" className="text-white">
-            Create
-          </Button>
+          <Button type="submit">Login</Button>
         )}
         <div className="flex gap-3">
           <p>Don't you have an account yet?</p>
           <Link
             to={"/register"}
-            className="text-blue-900 underline underline-offset-8"
+            className="text-blue-500 underline underline-offset-8"
           >
             Register
           </Link>
@@ -98,12 +97,15 @@ const FormLogin = () => {
           <h2 className="text-center font-semibold text-xl">Or</h2>
           <hr className="w-[50%] self-center" />
           <section className="flex items-center gap-3 self-center">
-            <FcGoogle
-              className="text-3xl cursor-pointer"
+            <div
+              className="bg-primary flex items-center gap-3 p-3 rounded-md cursor-pointer"
               onClick={() => {
                 authContext?.SignGoogle();
               }}
-            />
+            >
+              <FcGoogle className="text-3xl" />
+              <p>SignIn with Google</p>
+            </div>
           </section>
         </div>
       </form>

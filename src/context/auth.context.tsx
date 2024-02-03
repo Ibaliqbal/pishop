@@ -7,6 +7,7 @@ import {
 } from "react";
 import {
   createUserWithEmailAndPassword,
+  onAuthStateChanged,
   signInWithEmailAndPassword,
   signInWithPopup,
   signOut,
@@ -14,7 +15,7 @@ import {
 } from "firebase/auth";
 import { db, auth, googleProvider } from "@/firebaseConfig";
 import { setDoc, doc, serverTimestamp } from "firebase/firestore";
-import { dataUser } from "@/types/dataUser.type";
+import { dataUser } from "@/types/data.type";
 import { toast } from "sonner";
 import { UserLogin } from "@/components/Fragments/FormLogin";
 import { FirebaseError } from "firebase/app";
@@ -25,28 +26,28 @@ type AuthContextType = {
   SignUp: (data: dataUser) => Promise<void>;
   SignGoogle: () => Promise<void>;
   SignOut: () => Promise<void>;
-  user: User | undefined | null;
+  user: User | null;
   loading: boolean;
+  id: string;
 };
 
 type AuthProviderProps = {
   children: ReactNode;
 };
 
-export const AuthContext = createContext<AuthContextType | undefined>(
-  undefined
-);
+export const AuthContext = createContext<AuthContextType | null>(null);
 
 export const AuthProvider = ({ children }: AuthProviderProps): ReactElement => {
   const [user, setUser] = useState<User | null>({} as User);
   const [loading, setLoading] = useState<boolean>(false);
+  const [id, setId] = useState<string>("");
   const navigate = useNavigate();
   const SignIn = async (data: UserLogin) => {
     try {
       setLoading(true);
       await signInWithEmailAndPassword(auth, data.email, data.password);
       toast.success("Login successfuly");
-      navigate("/profile");
+      navigate("/");
     } catch (error) {
       toast.error("Sorry, password or email is not valid");
     } finally {
@@ -62,22 +63,24 @@ export const AuthProvider = ({ children }: AuthProviderProps): ReactElement => {
         data.password
       );
       await setDoc(doc(db, "users", res.user.uid), {
-        ...data,
-        image: res.user.photoURL,
-        displayName: res.user.displayName,
-        country: null,
-        phone: null,
-        address: null,
+        username: data.username,
+        email: data.email,
+        password: data.password,
+        image: res.user.photoURL ? res.user.photoURL : "-",
+        phone: "-",
+        address: "-",
+        isSeller: false,
+        role: "user",
         timestamp: serverTimestamp(),
       });
       toast.success("Login Successfully");
       setUser(res.user);
-      navigate("/profile");
+      navigate("/");
     } catch (error) {
       const err = error as FirebaseError;
       const errorCode = err.code;
       if (errorCode === "auth/email-already-in-use") {
-        toast.error("Sorry, has ready use");
+        toast.error("Sorry, email already use");
       } else if (errorCode === "auth/weak-password") {
         toast.error("Sorry, password to weak at least 6 characters");
       }
@@ -91,7 +94,18 @@ export const AuthProvider = ({ children }: AuthProviderProps): ReactElement => {
     try {
       const res = await signInWithPopup(auth, googleProvider);
       setUser(res.user);
-      toast.success("Login successful")
+      await setDoc(doc(db, "users", res.user.uid), {
+        email: res.user.email,
+        phone: res.user.phoneNumber ? res.user.phoneNumber : "-",
+        image: res.user.photoURL,
+        username: res.user.displayName,
+        address: "-",
+        isSeller: false,
+        role: "user",
+        timestamp: serverTimestamp(),
+      });
+      navigate("/");
+      toast.success("Login successful");
     } catch (error) {
       console.log(error);
     }
@@ -108,11 +122,12 @@ export const AuthProvider = ({ children }: AuthProviderProps): ReactElement => {
   };
 
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((userData) => {
-      if (userData) {
-        setUser(userData);
+    const unsubscribe = onAuthStateChanged(auth, (userdata) => {
+      if (userdata) {
+        setUser(userdata);
+        setId(userdata.uid);
       } else {
-        setUser(null)
+        setUser(null);
       }
     });
     return () => unsubscribe();
@@ -125,6 +140,7 @@ export const AuthProvider = ({ children }: AuthProviderProps): ReactElement => {
     SignUp,
     SignOut,
     SignGoogle,
+    id,
   };
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
