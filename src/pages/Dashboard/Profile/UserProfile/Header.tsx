@@ -12,7 +12,7 @@ const HeaderProfile = ({ setIsOpenEdit }: HeaderProfileProps) => {
   const { data, user } = useGetUserById();
   return (
     <header className="w-full flex items-center justify-between gap-6">
-      <Title size="text-3xl" text="Profile" />
+      <Title size="text-3xl" text={`Hello, ${data?.username}`} />
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -31,9 +31,11 @@ const HeaderProfile = ({ setIsOpenEdit }: HeaderProfileProps) => {
                 : "https://github.com/shadcn.png"
             }
           />
-          <AvatarFallback>CN</AvatarFallback>
+          <AvatarFallback className="text-black">CN</AvatarFallback>
         </Avatar>
-        <h1>{user ? data?.username : "Belum Login"}</h1>
+        <h1 className="text-sm md:text-lg">
+          {user ? data?.username : "Belum Login"}
+        </h1>
       </motion.div>
     </header>
   );

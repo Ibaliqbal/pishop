@@ -1,49 +1,49 @@
-import React, { useContext, useState } from "react";
+import { useContext } from "react";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "@/context/auth.context";
 import { toast } from "sonner";
 import { AiOutlineReload } from "react-icons/ai";
 import { motion } from "framer-motion";
 import LoginImg from "@/assets/signin.svg";
 import { FcGoogle } from "react-icons/fc";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "@/firebaseConfig";
 
-const inputsLogin = [
-  {
-    type: "email",
-    name: "email",
-    label: "Email",
-    placeholder: "example@gmail.com",
-  },
-  {
-    type: "password",
-    name: "password",
-    label: "Password",
-    placeholder: "Please input your password...",
-  },
-];
+const signInSchema = z.object({
+  email: z.string().email().trim(),
+  password: z.string().min(8, "Password at least 8 word"),
+});
 
-export type UserLogin = {
-  [index: string]: string;
-};
+type TSignInSchema = z.infer<typeof signInSchema>;
 
 const FormLogin = () => {
-  const [data, setData] = useState({} as UserLogin);
   const authContext = useContext(AuthContext);
+  const {
+    register,
+    reset,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<TSignInSchema>({
+    resolver: zodResolver(signInSchema),
+  });
+  const navigate = useNavigate();
 
-  const handleLogin = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (
-      Object.keys(data).includes(" ") ||
-      Object.keys(data).length === 0 ||
-      Object.keys(data).length < inputsLogin.length
-    ) {
-      toast.error("All input required");
-    } else {
-      authContext?.SignIn(data);
+  const onSubmit = async (data: TSignInSchema) => {
+    try {
+      await signInWithEmailAndPassword(auth, data.email, data.password);
+      toast.success("Login successfuly");
+      navigate("/");
+    } catch (error) {
+      toast.error("Sorry, password or email is not valid");
     }
+    console.log(data);
+    reset();
   };
 
   return (
@@ -56,27 +56,37 @@ const FormLogin = () => {
       <img src={LoginImg} alt="Login" width={300} className="md:block hidden" />
       <form
         className="w-[400px] py-6 flex flex-col gap-5 items-center text-white"
-        onSubmit={handleLogin}
+        onSubmit={handleSubmit(onSubmit)}
       >
-        <h1 className="font-bold text-xl">SignIn</h1>
-        {inputsLogin.map((input, i) => {
-          return (
-            <div className="w-[75%]" key={i}>
-              <Label htmlFor={input.name}>{input.label}</Label>
-              <Input
-                placeholder={input.placeholder}
-                type={input.type}
-                id={input.name}
-                name={input.name}
-                className="text-black"
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                  setData({ ...data, [e.target.id]: e.target.value })
-                }
-              />
-            </div>
-          );
-        })}
-        {authContext?.loading ? (
+        <h1 className="text-2xl font-bold">Welcome Back</h1>
+        <h2 className="font-bold text-md">SignIn</h2>
+        <div className="w-[75%]">
+          <Label htmlFor="email">Email</Label>
+          <Input
+            placeholder="expmale@gmail.com"
+            type="email"
+            id="email"
+            {...register("email")}
+            className="text-black"
+          />
+          {errors.email && (
+            <p className="text-red-500">{`${errors.email.message}`}</p>
+          )}
+        </div>
+        <div className="w-[75%]">
+          <Label htmlFor="password">Password</Label>
+          <Input
+            placeholder="Please input your password"
+            type="password"
+            id="password"
+            className="text-black"
+            {...register("password")}
+          />
+          {errors.password && (
+            <p className="text-red-500">{`${errors.password.message}`}</p>
+          )}
+        </div>
+        {isSubmitting ? (
           <Button disabled>
             <AiOutlineReload className="mr-2 w-4 h-4 animate-spin" />
             Please wait

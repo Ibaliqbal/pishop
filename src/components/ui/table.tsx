@@ -1,18 +1,24 @@
 import * as React from "react";
 
 import { cn } from "@/lib/utils";
+import { motion } from "framer-motion";
 
 const Table = React.forwardRef<
   HTMLTableElement,
   React.HTMLAttributes<HTMLTableElement>
 >(({ className, ...props }, ref) => (
-  <div className="relative w-full overflow-auto">
+  <motion.div
+    className="relative w-full overflow-auto"
+    initial={{ opacity: 0 }}
+    animate={{ opacity: 1 }}
+    transition={{ duration: 2 }}
+  >
     <table
       ref={ref}
       className={cn("w-full caption-bottom text-sm", className)}
       {...props}
     />
-  </div>
+  </motion.div>
 ));
 Table.displayName = "Table";
 

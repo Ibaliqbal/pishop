@@ -6,12 +6,19 @@ import { MdCameraAlt } from "react-icons/md";
 import { toast } from "sonner";
 import useStorageProducts from "@/hooks/useStorageProducts";
 import { useGetUserById } from "@/hooks/useGetUserById";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { db } from "@/firebaseConfig";
-import { doc, serverTimestamp, setDoc } from "firebase/firestore";
-import { useNavigate } from "react-router-dom";
+import {
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  query,
+  updateDoc,
+  where,
+} from "firebase/firestore";
+import { useNavigate, useParams } from "react-router-dom";
 import { motion } from "framer-motion";
-import { v4 as uuidv4 } from "uuid";
 import FormProduct from "@/components/Fragments/FormProduct";
 import { useForm } from "react-hook-form";
 import { TProductSchema, productSchema } from "@/types/products.type";
@@ -22,11 +29,19 @@ type Option = {
   label: string;
 };
 
-const AddNewProduct = () => {
-  const { data, id } = useGetUserById();
-  const { imagesProduct, handleDelete, uploadImage, progress } =
-    useStorageProducts();
+const EditProduct = () => {
+  const { data } = useGetUserById();
+  const { id: IdProduct } = useParams();
+  const [loadProduct, setLoadProduct] = useState<boolean>(false);
+  const {
+    imagesProduct,
+    handleDelete,
+    setImagesProduct,
+    uploadImage,
+    progress,
+  } = useStorageProducts();
   const [categoriesProducts, setCategoriesProducts] = useState<any>([]);
+  const [sellerName, setSellerName] = useState<string>("");
   const [sizesProducts, setSizesProducts] = useState<any>([]);
   const [errorCate, setErrorCate] = useState<string>("");
   const [spekProduct, setSpekProduct] = useState<
@@ -35,34 +50,72 @@ const AddNewProduct = () => {
       valSpek: string;
     }[]
   >([]);
+  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting },
-    reset,
+    setValue,
+    formState: { isSubmitting, errors },
   } = useForm<TProductSchema>({
     resolver: zodResolver(productSchema),
   });
-  const navigate = useNavigate();
+
+  useEffect(() => {
+    const getProduct = async () => {
+      try {
+        setLoadProduct(true);
+        const product = await getDoc(doc(db, "allproducts", IdProduct ?? ""));
+        setImagesProduct(product.data()?.product_image);
+        setValue("name_product", product.data()?.name_product);
+        setValue("ket_product", product.data()?.ket_product);
+        setValue("price_product", product.data()?.price_product);
+        setValue("stock_product", product.data()?.stock_product);
+        setCategoriesProducts(
+          product.data()?.category_product.map((cate: string) => {
+            return {
+              value: cate,
+              label: cate,
+            };
+          })
+        );
+        setSizesProducts(
+          product.data()?.size_product.map((size: string) => {
+            return {
+              value: size,
+              label: size,
+            };
+          })
+        );
+        setSpekProduct(product.data()?.spek_product);
+        setSellerName(product.data()?.name_seller);
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setLoadProduct(false);
+      }
+    };
+    IdProduct && getProduct();
+  }, [IdProduct]);
 
   const handleChangeCategory = (option: MultiValue<unknown>) => {
-    setCategoriesProducts(option);
+    setCategoriesProducts((prev: MultiValue<unknown>) => [...prev, option]);
   };
   const handleChangeSizes = (option: MultiValue<unknown>) => {
-    setSizesProducts(option);
+    setSizesProducts((prev: MultiValue<unknown>) => [...prev, option]);
   };
 
-  const onSubmitAddProduct = async (dataForm: TProductSchema) => {
-    const query = doc(db, "users", id ?? "");
-    const idDoc = uuidv4();
+  const onSubmitUpdateProduct = async (dataForm: TProductSchema) => {
     try {
       if (categoriesProducts.length > 0) {
-        await setDoc(doc(query, "products", idDoc), {
+        const sellerRef = query(
+          collection(db, "users"),
+          where("username", "==", sellerName)
+        );
+        const sellerSnap = await getDocs(sellerRef);
+        await updateDoc(doc(db, "allproducts", IdProduct ?? ""), {
           ...dataForm,
-          price_product: dataForm.price_product,
-          name_seller: data?.username,
           product_image: imagesProduct,
-          sender_address: data?.address,
+          price_product: dataForm.price_product,
           category_product: categoriesProducts.map(
             (data: Option) => data.value
           ),
@@ -70,34 +123,28 @@ const AddNewProduct = () => {
             sizesProducts.length > 0
               ? sizesProducts.map((data: Option) => data.value)
               : [],
-          phone_seller: data?.phone,
-          comments_product: [],
-          craetedAt: serverTimestamp(),
-          soldout_product: 0,
           image_seller: data?.image,
           spek_product: spekProduct,
         });
-        await setDoc(doc(db, "allproducts", idDoc), {
-          ...dataForm,
-          price_product: dataForm.price_product,
-          name_seller: data?.username,
-          product_image: imagesProduct,
-          sender_address: data?.address,
-          category_product: categoriesProducts.map(
-            (data: Option) => data.value
-          ),
-          size_product:
-            sizesProducts.length > 0
-              ? sizesProducts.map((data: Option) => data.value)
-              : [],
-          phone_seller: data?.phone,
-          comments_product: [],
-          craetedAt: serverTimestamp(),
-          soldout_product: 0,
-          image_seller: data?.image,
-          spek_product: spekProduct,
-        });
-        toast.success("Product uploaded successfully");
+
+        await updateDoc(
+          doc(sellerSnap.docs[0].ref, "products", IdProduct ?? ""),
+          {
+            product_image: imagesProduct,
+            ...dataForm,
+            price_product: dataForm.price_product,
+            category_product: categoriesProducts.map(
+              (data: Option) => data.value
+            ),
+            size_product:
+              sizesProducts.length > 0
+                ? sizesProducts.map((data: Option) => data.value)
+                : [],
+            image_seller: data?.image,
+            spek_product: spekProduct,
+          }
+        );
+        toast.success("Product updated successfully");
         navigate("/profile");
       } else {
         setErrorCate("Choose option at least one option");
@@ -105,19 +152,16 @@ const AddNewProduct = () => {
     } catch (error) {
       console.log(error);
     }
-    reset();
   };
-  return (
+  return loadProduct ? (
+    <div className="loader"></div>
+  ) : (
     <DefaultLayout>
       <div className="text-white px-4 pb-4 pt-8 w-full">
         <button onClick={() => history.back()} className="text-white text-2xl">
           <IoMdArrowRoundBack />
         </button>
-        <Title
-          size="text-2xl"
-          className="text-center"
-          text="Tambah Product Baru"
-        />
+        <Title size="text-2xl" className="text-center" text="Edit Product" />
         <div className="max-w-full rounded-md flex items-center p-2 gap-2 border-4 border-white mt-4">
           {imagesProduct.length > 0 ? (
             imagesProduct.map((image, i) => (
@@ -147,10 +191,10 @@ const AddNewProduct = () => {
           )}
         </div>
         <FormProduct
-          isSubmitting={isSubmitting}
           data={data}
+          isSubmitting={isSubmitting}
           handleSubmitForm={handleSubmit}
-          onSubmitProduct={onSubmitAddProduct}
+          onSubmitProduct={onSubmitUpdateProduct}
           register={register}
           categoriesProducts={categoriesProducts}
           handleChangeCategory={handleChangeCategory}
@@ -160,7 +204,7 @@ const AddNewProduct = () => {
           spekProduct={spekProduct}
           uploadImage={uploadImage}
           progress={progress}
-          type="add"
+          type="update"
           errors={errors}
           errorCate={errorCate}
         />
@@ -169,4 +213,4 @@ const AddNewProduct = () => {
   );
 };
 
-export default AddNewProduct;
+export default EditProduct;

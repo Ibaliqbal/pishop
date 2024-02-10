@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext } from "react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "../ui/button";
 import { AuthContext } from "@/context/auth.context";
@@ -7,16 +7,8 @@ import { motion } from "framer-motion";
 
 const route = [
   {
-    path: "/",
-    label: "Home",
-  },
-  {
     path: "/profile",
     label: "Profile",
-  },
-  {
-    path: "/",
-    label: "Cart",
   },
   {
     path: "/",
@@ -24,8 +16,16 @@ const route = [
   },
 ];
 
+const profileRoute = [
+  "/profile",
+  "/profile/cart",
+  "/profile/transaction",
+  "/profile/dashboard",
+  "/profile/report",
+  "/profile/product_manage",
+];
+
 const Navbar = () => {
-  const [isOpen, setIsOpen] = useState<boolean>(false);
   const navigate = useNavigate();
   const authContext = useContext(AuthContext);
   const location = useLocation();
@@ -40,11 +40,7 @@ const Navbar = () => {
       >
         PiShopp
       </motion.h1>
-      {location.pathname === "/profile" ||
-      location.pathname === "/profile/cart" ||
-      location.pathname === "/profile/transaction" ||
-      location.pathname === "/profile/dashboard" ||
-      location.pathname === "/profile/report" ? (
+      {profileRoute.includes(location.pathname) ? (
         authContext?.user ? (
           <div className="flex gap-3 items-center">
             <IoHomeSharp
@@ -77,13 +73,9 @@ const Navbar = () => {
       ) : (
         <div className="flex items-center gap-3">
           <nav
-            className={`fixed bottom-0 left-0 w-full flex justify-center items-center py-4 lg:p-0 lg:static lg:block bg-blue-400`}
+            className={`fixed bottom-0 left-0 w-full z-20 lg:z-0 bg-slate-800 lg:bg-transparent flex justify-center items-center py-4 lg:p-0 lg:static lg:block`}
           >
-            <ul
-              className={`flex items-center ${
-                isOpen ? "flex-col" : null
-              } gap-4 navbar`}
-            >
+            <ul className={`flex items-center gap-4 navbar`}>
               {route.map((to, i) => (
                 <motion.li
                   animate={{ scale: 1, opacity: 1 }}

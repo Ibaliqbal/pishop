@@ -1,10 +1,11 @@
 import { storage } from "@/firebaseConfig";
 import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 
 const useStorageProducts = () => {
   const [imagesProduct, setImagesProduct] = useState<string[]>([]);
+  const [productImages, setProductImages] = useState<string[]>([]);
   const [error, setError] = useState<Error>();
   const [progress, setProgress] = useState<number>(0);
 
@@ -13,7 +14,6 @@ const useStorageProducts = () => {
 
     const filedId = uuidv4();
     const formatFile = file.type.split("/")[1];
-    console.log("ini dari custom hook", file);
     const storageRef = ref(
       storage,
       `products/${sellerName}/${filedId}.${formatFile}`
@@ -30,10 +30,13 @@ const useStorageProducts = () => {
         setError(err);
       },
       () => {
+        // const url = await getDownloadURL(uploadTask.snapshot.ref)
+        // console.log("url gambar",url)
+        // setImagesProduct(prev => [...prev, url])
         getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-          console.log(downloadURL);
-          setProgress(0)
+          setProgress(0);
           setImagesProduct((prev) => [...prev, downloadURL]);
+          console.log(downloadURL);
         });
       }
     );
@@ -44,7 +47,15 @@ const useStorageProducts = () => {
     setImagesProduct(filterImage);
   };
 
-  return { imagesProduct, error, progress, uploadImage, handleDelete };
+  return {
+    imagesProduct,
+    error,
+    progress,
+    uploadImage,
+    handleDelete,
+    setImagesProduct,
+    productImages,
+  };
 };
 
 export default useStorageProducts;

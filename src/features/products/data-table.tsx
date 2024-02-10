@@ -23,11 +23,13 @@ import { useState } from "react";
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
+  className?: string;
 }
 
-export default function UserDataTable<TData, TValue>({
+export default function ProductDataTable<TData, TValue>({
   columns,
   data,
+  className,
 }: DataTableProps<TData, TValue>) {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const table = useReactTable({
@@ -43,17 +45,17 @@ export default function UserDataTable<TData, TValue>({
   });
 
   return (
-    <div className="pt-8">
+    <div className={`pt-8 ${className}`}>
       {/* input */}
       <div className="mb-4">
         <Input
-          placeholder="Search user..."
+          placeholder="Search product..."
           className="max-w-sm text-black"
           value={
-            (table.getColumn("username")?.getFilterValue() as string) || ""
+            (table.getColumn("name_product")?.getFilterValue() as string) || ""
           }
           onChange={(e) => {
-            table.getColumn("username")?.setFilterValue(e.target.value)
+            table.getColumn("name_product")?.setFilterValue(e.target.value);
           }}
         />
       </div>

@@ -1,10 +1,14 @@
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { Dispatch, SetStateAction, lazy, useState } from "react";
 import HeaderProfile from "./Header";
-import { HiOutlineShoppingBag, HiArrowNarrowRight } from "react-icons/hi";
-import CountUp from "react-countup";
 import { useNavigate } from "react-router-dom";
 import { useGetUserById } from "@/hooks/useGetUserById";
-import { useGetProductByOwner } from "@/hooks/useGetProductByOwner";
+import { ToRupiah } from "@/utils/toRupiah";
+import { HiArrowNarrowRight } from "react-icons/hi";
+import { useGetProductsOwner } from "@/hooks/useGetProductsOwner";
+const CardProduct = lazy(() => import("@/components/CardProduct"));
+import Select, { SingleValue } from "react-select";
+import ProductDataTable from "@/features/products/data-table";
+import { columnsProductsOwner } from "@/features/products/columnsProductsOwner";
 
 type UserProfileProps = {
   setIsOpenEdit: Dispatch<SetStateAction<boolean>>;
@@ -12,35 +16,32 @@ type UserProfileProps = {
 
 const UserProfile = ({ setIsOpenEdit }: UserProfileProps) => {
   const navigate = useNavigate();
-  const { data, user } = useGetUserById();
-  const [product, setProduct] = useState<any>([]);
-  const products = useGetProductByOwner(data?.username);
+  const { data, user, id } = useGetUserById();
+  const [layout, setLayout] = useState<
+    SingleValue<{ label: string; value: string }>
+  >({ label: "Card", value: "card" });
+  const products = useGetProductsOwner(id ?? "");
+  const selectLayoutProducts = [
+    { label: "Card", value: "card" },
+    {
+      label: "Tabel",
+      value: "tabel",
+    },
+  ];
 
-  const getProduct = async () => {
-    const res = await fetch("https://fakestoreapi.com/products");
-    const result = await res.json();
-    setProduct(result);
+  const handleLayout = (
+    option: SingleValue<{ label: string; value: string }>
+  ) => {
+    console.log(option);
+    setLayout(option);
   };
-  useEffect(() => {
-    getProduct();
-    const owner = products.filter(
-      (data) => data.name_seller === "Iqbal Muthahhary"
-    );
-    console.log({ owner });
-    console.log({ products });
-  }, []);
   return (
-    <section className="p-4">
+    <section className="px-4 pt-4 pb-10">
       <HeaderProfile setIsOpenEdit={setIsOpenEdit} />
       <div className="flex flex-col gap-3 my-4">
         <h2>Your Cash</h2>
         <p className="text-2xl">
-          {user
-            ? data?.e_wallet.toLocaleString("id-ID", {
-                style: "currency",
-                currency: "IDR",
-              })
-            : null}
+          {user ? ToRupiah(data?.e_wallet ?? 0) : null}
         </p>
       </div>
       <div
@@ -50,7 +51,7 @@ const UserProfile = ({ setIsOpenEdit }: UserProfileProps) => {
         <h1>Your Transaction History</h1>
         <HiArrowNarrowRight />
       </div>
-      {/* {data ? (
+      {data ? (
         data.isSeller ? (
           <>
             <div
@@ -61,39 +62,32 @@ const UserProfile = ({ setIsOpenEdit }: UserProfileProps) => {
               <HiArrowNarrowRight />
             </div>
             <div>
-              <h1>Your Product</h1>
-              <div className="grid lg:grid-cols-6 gap-6 md:grid-cols-4 grid-cols-2">
-                {product.map((data: any) => {
-                  return (
-                    <div
-                      key={data.id}
-                      className="flex gap-3 flex-col bg-blue-400 p-4 items-center justify-between"
-                    >
-                      <img
-                        src={data.image}
-                        alt=""
-                        className="w-[150px] h-[150px]"
-                      />
-                      <div>
-                        <h1 className="text-[12px] md:text-md">{data.title}</h1>
-                        <p className="self-start">{data.price}</p>
-                      </div>
-                    </div>
-                  );
-                })}
+              <div className="w-full flex items-center justify-between">
+                <h1 className="md:text-xl text-md">Your Product</h1>
+                <Select
+                  options={selectLayoutProducts}
+                  defaultValue={selectLayoutProducts[0]}
+                  className="text-black w-40"
+                  onChange={handleLayout}
+                />
+              </div>
+              <div className="grid lg:grid-cols-6 gap-2 lg:gap-3 md:grid-cols-4 grid-cols-2 mt-4">
+                {layout?.value === "card" ? (
+                  products.map((data) => {
+                    return <CardProduct data={data} key={data.id} />;
+                  })
+                ) : (
+                  <ProductDataTable
+                    data={products}
+                    columns={columnsProductsOwner}
+                    className="lg:col-span-6 md:col-span-4 col-span-2"
+                  />
+                )}
               </div>
             </div>
           </>
         ) : null
-      ) : null} */}
-      <div>
-        <h1>Test</h1>
-        {products
-          ? products
-              .filter((data) => data.name_seller === "Iqbal Muthahhary")
-              .map((data) => <p className="text-white">{data.name_product}</p>)
-          : null}
-      </div>
+      ) : null}
     </section>
   );
 };

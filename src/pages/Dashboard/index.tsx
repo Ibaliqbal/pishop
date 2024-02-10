@@ -51,7 +51,8 @@ const DashboardUser = ({ data, user, id }: DasboarUserProps) => {
 
 const DashboardAdmin = () => {
   const location = useLocation();
-  return location.pathname === "/profile" ? (
+  return location.pathname === "/profile" ||
+    location.pathname === "/profile/product_manage" ? (
     <ManageDashboard />
   ) : (
     <UserReport />

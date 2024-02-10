@@ -14,15 +14,22 @@ import {
   User,
 } from "firebase/auth";
 import { db, auth, googleProvider } from "@/firebaseConfig";
-import { setDoc, doc, serverTimestamp } from "firebase/firestore";
+import {
+  setDoc,
+  doc,
+  serverTimestamp,
+  collection,
+  query,
+  where,
+  getDocs,
+  getDoc,
+} from "firebase/firestore";
 import { dataUser } from "@/types/data.type";
 import { toast } from "sonner";
-import { UserLogin } from "@/components/Fragments/FormLogin";
 import { FirebaseError } from "firebase/app";
 import { useNavigate } from "react-router-dom";
 
 type AuthContextType = {
-  SignIn: (data: UserLogin) => Promise<void>;
   SignUp: (data: dataUser) => Promise<void>;
   SignGoogle: () => Promise<void>;
   SignOut: () => Promise<void>;
@@ -42,18 +49,6 @@ export const AuthProvider = ({ children }: AuthProviderProps): ReactElement => {
   const [loading, setLoading] = useState<boolean>(false);
   const [id, setId] = useState<string>("");
   const navigate = useNavigate();
-  const SignIn = async (data: UserLogin) => {
-    try {
-      setLoading(true);
-      await signInWithEmailAndPassword(auth, data.email, data.password);
-      toast.success("Login successfuly");
-      navigate("/");
-    } catch (error) {
-      toast.error("Sorry, password or email is not valid");
-    } finally {
-      setLoading(false);
-    }
-  };
   const SignUp = async (data: dataUser) => {
     try {
       setLoading(true);
@@ -71,6 +66,7 @@ export const AuthProvider = ({ children }: AuthProviderProps): ReactElement => {
         address: "-",
         isSeller: false,
         role: "user",
+        e_wallet: 1500000,
         timestamp: serverTimestamp(),
       });
       toast.success("Login Successfully");
@@ -94,18 +90,25 @@ export const AuthProvider = ({ children }: AuthProviderProps): ReactElement => {
     try {
       const res = await signInWithPopup(auth, googleProvider);
       setUser(res.user);
-      await setDoc(doc(db, "users", res.user.uid), {
-        email: res.user.email,
-        phone: res.user.phoneNumber ? res.user.phoneNumber : "-",
-        image: res.user.photoURL,
-        username: res.user.displayName,
-        address: "-",
-        isSeller: false,
-        role: "user",
-        timestamp: serverTimestamp(),
-      });
-      navigate("/");
-      toast.success("Login successful");
+      const checkData = await getDoc(doc(db, "users", res.user.uid));
+      if (checkData.exists()) {
+        navigate("/");
+        toast.success("Login successfully");
+      } else {
+        await setDoc(doc(db, "users", res.user.uid), {
+          email: res.user.email,
+          phone: res.user.phoneNumber ? res.user.phoneNumber : "-",
+          image: res.user.photoURL,
+          username: res.user.displayName,
+          address: "-",
+          isSeller: false,
+          role: "user",
+          e_wallert: 1500000,
+          timestamp: serverTimestamp(),
+        });
+        navigate("/");
+        toast.success("Login successfully");
+      }
     } catch (error) {
       console.log(error);
     }
@@ -136,7 +139,6 @@ export const AuthProvider = ({ children }: AuthProviderProps): ReactElement => {
   const value = {
     user,
     loading,
-    SignIn,
     SignUp,
     SignOut,
     SignGoogle,

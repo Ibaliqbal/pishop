@@ -84,16 +84,23 @@ body::-webkit-scrollbar {
   width: 5px;
 }
 
-body::-webkit-scrollbar-track {
+.kum-img::-webkit-scrollbar {
+  height: 5px;
+}
+
+body::-webkit-scrollbar-track,
+.kum-img::-webkit-scrollbar-track {
   background: #1c1c1c;
 }
 
-body::-webkit-scrollbar-thumb {
+body::-webkit-scrollbar-thumb,
+.kum-img::-webkit-scrollbar-thumb {
   @apply rounded-lg;
   background: #888;
 }
 
-body::-webkit-scrollbar-thumb:hover {
+body::-webkit-scrollbar-thumb:hover,
+.kum-img::-webkit-scrollbar-thumb:hover {
   background: #555;
 }
 
@@ -104,6 +111,14 @@ body::-webkit-scrollbar-thumb:hover {
 
 .side-list {
   padding-block: 2rem;
+}
+
+.product-card {
+  background: rgba(255, 255, 255, 0.05);
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
 }
 
 /* Loader two */
