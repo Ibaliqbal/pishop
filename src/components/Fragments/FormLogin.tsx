@@ -17,7 +17,7 @@ import { auth } from "@/firebaseConfig";
 
 const signInSchema = z.object({
   email: z.string().email().trim(),
-  password: z.string().min(8, "Password at least 8 word"),
+  password: z.string().min(6, "Password at least 8 word"),
 });
 
 type TSignInSchema = z.infer<typeof signInSchema>;
@@ -26,7 +26,6 @@ const FormLogin = () => {
   const authContext = useContext(AuthContext);
   const {
     register,
-    reset,
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<TSignInSchema>({
@@ -35,15 +34,19 @@ const FormLogin = () => {
   const navigate = useNavigate();
 
   const onSubmit = async (data: TSignInSchema) => {
-    try {
-      await signInWithEmailAndPassword(auth, data.email, data.password);
-      toast.success("Login successfuly");
+    if (authContext?.user) {
+      toast.error("Sorry your have already login");
       navigate("/");
-    } catch (error) {
-      toast.error("Sorry, password or email is not valid");
+    } else {
+      try {
+        await signInWithEmailAndPassword(auth, data.email, data.password);
+        toast.success("Login successfuly");
+        navigate("/");
+      } catch (error) {
+        toast.error("Sorry, password or email is not valid");
+      }
     }
     console.log(data);
-    reset();
   };
 
   return (
@@ -110,7 +113,12 @@ const FormLogin = () => {
             <div
               className="bg-primary flex items-center gap-3 p-3 rounded-md cursor-pointer"
               onClick={() => {
-                authContext?.SignGoogle();
+                if (authContext?.user) {
+                  toast.error("Sorry your have already login");
+                  navigate("/");
+                } else {
+                  authContext?.SignGoogle();
+                }
               }}
             >
               <FcGoogle className="text-3xl" />

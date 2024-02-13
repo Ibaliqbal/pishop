@@ -39,7 +39,6 @@ const AddNewProduct = () => {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-    reset,
   } = useForm<TProductSchema>({
     resolver: zodResolver(productSchema),
   });
@@ -72,7 +71,7 @@ const AddNewProduct = () => {
               : [],
           phone_seller: data?.phone,
           comments_product: [],
-          craetedAt: serverTimestamp(),
+          createdAt: serverTimestamp(),
           soldout_product: 0,
           image_seller: data?.image,
           spek_product: spekProduct,
@@ -92,7 +91,7 @@ const AddNewProduct = () => {
               : [],
           phone_seller: data?.phone,
           comments_product: [],
-          craetedAt: serverTimestamp(),
+          createdAt: serverTimestamp(),
           soldout_product: 0,
           image_seller: data?.image,
           spek_product: spekProduct,
@@ -105,7 +104,6 @@ const AddNewProduct = () => {
     } catch (error) {
       console.log(error);
     }
-    reset();
   };
   return (
     <DefaultLayout>

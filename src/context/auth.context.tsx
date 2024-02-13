@@ -8,22 +8,12 @@ import {
 import {
   createUserWithEmailAndPassword,
   onAuthStateChanged,
-  signInWithEmailAndPassword,
   signInWithPopup,
   signOut,
   User,
 } from "firebase/auth";
 import { db, auth, googleProvider } from "@/firebaseConfig";
-import {
-  setDoc,
-  doc,
-  serverTimestamp,
-  collection,
-  query,
-  where,
-  getDocs,
-  getDoc,
-} from "firebase/firestore";
+import { setDoc, doc, serverTimestamp, getDoc } from "firebase/firestore";
 import { dataUser } from "@/types/data.type";
 import { toast } from "sonner";
 import { FirebaseError } from "firebase/app";

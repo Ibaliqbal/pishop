@@ -3,12 +3,13 @@ import HeaderProfile from "./Header";
 import { useNavigate } from "react-router-dom";
 import { useGetUserById } from "@/hooks/useGetUserById";
 import { ToRupiah } from "@/utils/toRupiah";
-import { HiArrowNarrowRight } from "react-icons/hi";
+import { HiArrowNarrowRight, HiShoppingCart } from "react-icons/hi";
 import { useGetProductsOwner } from "@/hooks/useGetProductsOwner";
 const CardProduct = lazy(() => import("@/components/CardProduct"));
 import Select, { SingleValue } from "react-select";
 import ProductDataTable from "@/features/products/data-table";
 import { columnsProductsOwner } from "@/features/products/columnsProductsOwner";
+import CartModal from "@/features/cart/CartModal";
 
 type UserProfileProps = {
   setIsOpenEdit: Dispatch<SetStateAction<boolean>>;
@@ -38,11 +39,14 @@ const UserProfile = ({ setIsOpenEdit }: UserProfileProps) => {
   return (
     <section className="px-4 pt-4 pb-10">
       <HeaderProfile setIsOpenEdit={setIsOpenEdit} />
-      <div className="flex flex-col gap-3 my-4">
-        <h2>Your Cash</h2>
-        <p className="text-2xl">
-          {user ? ToRupiah(data?.e_wallet ?? 0) : null}
-        </p>
+      <div className="my-6 flex items-center justify-between">
+        <div className="flex flex-col gap-3">
+          <h2>Your Cash</h2>
+          <p className="text-2xl">
+            {user ? ToRupiah(data?.e_wallet ?? 0) : null}
+          </p>
+        </div>
+        <CartModal />
       </div>
       <div
         className="my-4 flex items-center justify-between bg-white/40 p-4 rounded-md cursor-pointer"

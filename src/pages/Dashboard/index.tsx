@@ -1,5 +1,5 @@
 import DefaultLayout from "@/components/Layout/DefaultLayout";
-import { useLocation } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
 import Profile from "./Profile";
 import Cart from "./Cart";
 import Transaction from "./Transaction";
@@ -44,8 +44,10 @@ const DashboardUser = ({ data, user, id }: DasboarUserProps) => {
     <Profile data={data} user={user} id={id} />
   ) : location.pathname === "/profile/cart" ? (
     <Cart />
-  ) : (
+  ) : location.pathname === "/profile/transaction" ? (
     <Transaction />
+  ) : (
+    <Navigate to={"/"} />
   );
 };
 

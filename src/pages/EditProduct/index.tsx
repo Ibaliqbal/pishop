@@ -14,6 +14,7 @@ import {
   getDoc,
   getDocs,
   query,
+  serverTimestamp,
   updateDoc,
   where,
 } from "firebase/firestore";
@@ -125,6 +126,7 @@ const EditProduct = () => {
               : [],
           image_seller: data?.image,
           spek_product: spekProduct,
+          updatedAt: serverTimestamp()
         });
 
         await updateDoc(
@@ -142,6 +144,7 @@ const EditProduct = () => {
                 : [],
             image_seller: data?.image,
             spek_product: spekProduct,
+            updatedAt: serverTimestamp()
           }
         );
         toast.success("Product updated successfully");

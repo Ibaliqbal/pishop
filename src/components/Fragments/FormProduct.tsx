@@ -184,13 +184,13 @@ const FormProduct = ({
           id="stock_product"
           placeholder="Masukkan jumlah product anda"
           className="text-black"
-          {...register("stock_product", {valueAsNumber: true})}
+          {...register("stock_product", { valueAsNumber: true })}
         />
         {errors.stock_product && (
           <p className="text-red-500">{errors.stock_product?.message}</p>
         )}
       </div>
-      <div className="bg-gray-800 p-3">
+      <div className="bg-gray-800 p-3 w-full">
         <h3>Product Specifications</h3>
         <div className="mt-3 flex flex-col md:flex-row gap-4">
           <div className="grow">
@@ -237,16 +237,26 @@ const FormProduct = ({
               initial={{ opacity: 0, y: 100 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 1 }}
-              className="grid grid-cols-2 gap-4"
+              className="flex flex-col md:flex-row gap-4"
             >
-              <div>
+              <div className="grow">
                 <Label>Name</Label>
                 <Input readOnly value={spek.nameSpek} className="text-black" />
               </div>
-              <div>
+              <div className="grow">
                 <Label>Value</Label>
                 <Input readOnly value={spek.valSpek} className="text-black" />
               </div>
+              <Button
+                size="lg"
+                type="button"
+                className="self-end w-[20px] grow-0 justify-self-end font-bold text-xl bg-red-500 hover:bg-red-800 focus:bg-red-800 "
+                onClick={() =>
+                  setSpekProduct(spekProduct.filter((_, index) => index !== i))
+                }
+              >
+                X
+              </Button>
             </motion.div>
           ))}
         </div>

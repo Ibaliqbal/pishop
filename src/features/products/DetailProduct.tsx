@@ -7,7 +7,10 @@ import {
   doc,
   getDoc,
   getDocs,
+  onSnapshot,
   query,
+  setDoc,
+  updateDoc,
   where,
 } from "firebase/firestore";
 import { useEffect, useState } from "react";
@@ -31,6 +34,11 @@ import {
 } from "@/components/ui/dialog";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
+import { GetDataType } from "@/types/data.type";
+import { useGetUserById } from "@/hooks/useGetUserById";
+import { useAddToCart } from "@/context/cart.context";
+import { v4 as uuidv4 } from "uuid";
+import { Products } from "@/types/products.type";
 
 const report = [
   "Kategori produk salah/tidak sesuai",
@@ -46,37 +54,57 @@ const report = [
 
 const DetailProduct = () => {
   const { id } = useParams();
-  const [product, setProduct] = useState<DocumentData | undefined>(undefined);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [product, setProduct] = useState<DocumentData | undefined | Products>(
+    undefined
+  );
   const [imageProduct, setImageProduct] = useState<string>("");
-  const [qty, setQty] = useState<number>(0);
+  const [qty, setQty] = useState<number>(1);
   const [checkReport, setCheckReport] = useState<string[]>([]);
-  const [sellerId, setSellerId] = useState<string>();
+  const [seller, setSeller] = useState<GetDataType>();
   const products = useGetProducts();
   const navigate = useNavigate();
+  const { data, id: idUser } = useGetUserById();
+  const addToCart = useAddToCart();
   useEffect(() => {
-    const getProduct = async () => {
-      try {
-        setLoading(true);
-        const docRef = doc(db, "allproducts", id ?? "");
-        const document = await getDoc(docRef);
+    const unsuscribe = onSnapshot(
+      doc(db, "allproducts", id ?? ""),
+      async (snapshot) => {
+        setProduct({ ...snapshot.data(), id: snapshot.id });
+        setImageProduct(snapshot.data()?.product_image[0]);
         const q = query(
           collection(db, "users"),
-          where("username", "==", document.data()?.name_seller)
+          where("username", "==", snapshot.data()?.name_seller)
         );
-        const snapshot = await getDocs(q);
-        snapshot.forEach((doc) => {
-          setSellerId(doc.id);
+        const snapshotSeller = await getDocs(q);
+        let sellerData = {} as any;
+        snapshotSeller.forEach((doc) => {
+          sellerData = { ...doc.data(), id: doc.id };
         });
-        setImageProduct(document.data()?.product_image);
-        setProduct(document.data());
-      } catch (error) {
-        console.log(error);
-      } finally {
-        setLoading(false);
+        setSeller(sellerData);
       }
-    };
-    id && getProduct();
+    );
+    //   try {
+    //     setLoading(true);
+    //     const docRef = doc(db, "allproducts", id ?? "");
+    //     const document = await getDoc(docRef);
+    //     const q = query(
+    //       collection(db, "users"),
+    //       where("username", "==", document.data()?.name_seller)
+    //     );
+    //     const snapshot = await getDocs(q);
+    //     snapshot.forEach((doc) => {
+    //       setSellerId(doc.id);
+    //     });
+    //     setImageProduct(document.data()?.product_image);
+    //     setProduct(document.data());
+    //   } catch (error) {
+    //     console.log(error);
+    //   } finally {
+    //     setLoading(false);
+    //   }
+    // };
+    // id && getProduct();
+    return () => unsuscribe();
   }, [id]);
 
   const variant = {
@@ -114,12 +142,72 @@ const DetailProduct = () => {
     toast.success("Berhasil melaporkan");
     setCheckReport([]);
   };
+
+  const handleFollowShop = async () => {
+    if (data?.email === seller?.email)
+      return toast.error("You can't follow yourself");
+    await updateDoc(doc(db, "users", idUser ?? ""), {
+      followShop: [...data?.followShop, product?.name_seller],
+    });
+    const updateFoolowers = seller?.followers ? seller.followers + 1 : 0 + 1;
+    await updateDoc(doc(db, "users", seller?.id ?? ""), {
+      followers: updateFoolowers,
+    });
+  };
+
+  const handleUnFollowShop = async () => {
+    await updateDoc(doc(db, "users", idUser ?? ""), {
+      followShop: data?.followShop.filter(
+        (shop: string) => shop !== product?.name_seller
+      ),
+    });
+    if (seller?.followers) {
+      const updateFoolowers = seller.followers > 0 ? seller.followers - 1 : 0;
+      console.log(updateFoolowers);
+      console.log(seller?.id);
+      await updateDoc(doc(db, "users", seller?.id ?? ""), {
+        followers: updateFoolowers,
+      });
+    }
+  };
+
+  const handleAddToCart = async () => {
+    const idDoc = uuidv4();
+    const queryUser = doc(db, "users", idUser ?? "");
+    const queryNameProduct = query(
+      collection(queryUser, "cart"),
+      where("name_product", "==", product?.name_product)
+    );
+    const snapshot = await getDocs(queryNameProduct);
+    const addCart = {
+      id_product: product?.id,
+      name_product: product?.name_product,
+      thumbnail: product?.product_image[0],
+      price: product?.price_product,
+      name_seller: product?.name_seller,
+      quantity: qty,
+      checkout_product: false,
+    };
+    if (snapshot.docs[0]?.exists()) {
+      await updateDoc(doc(queryUser, "cart", snapshot.docs[0].id), {
+        quantity: snapshot.docs[0].data().quantity + qty,
+      });
+      addToCart(addCart);
+    } else {
+      await setDoc(doc(queryUser, "cart", idDoc), {
+        ...addCart,
+      });
+      addToCart(addCart);
+    }
+    toast.success("berhasil di masukkan ke cart");
+  };
+
   return (
     <DefaultLayout>
       <button onClick={() => history.back()} className="text-white text-2xl">
         <BsArrowLeft />
       </button>
-      {!loading ? (
+      {product ? (
         product ? (
           <section className="text-white w-full px-2 pt-4 pb-20 md:pb-8">
             <div className="grid lg:grid-cols-3 place-items-center lg:place-items-stretch gap-3">
@@ -138,10 +226,11 @@ const DetailProduct = () => {
                   {product?.product_image.map((img: string, i: number) => (
                     <img
                       src={img}
-                      alt=""
+                      alt="Product"
                       key={i}
                       className="w-[150px] h-[150px]"
                       onMouseOver={() => setImageProduct(img)}
+                      onClick={() => setImageProduct(img)}
                     />
                   ))}
                 </div>
@@ -208,6 +297,7 @@ const DetailProduct = () => {
                 <h2 className="md:text-6xl my-8">
                   {ToRupiah(product?.price_product)}
                 </h2>
+                {/* <p>{product?.timestamp}</p> */}
                 <div className="flex items-center gap-4 my-6">
                   <div className="flex items-center">
                     <Button
@@ -251,6 +341,7 @@ const DetailProduct = () => {
                   <Button
                     size="lg"
                     className="bg-slate-700/30 hover:bg-slate-800/70"
+                    onClick={() => handleAddToCart()}
                   >
                     Add to cart <BsCart4 className="ml-3" />
                   </Button>
@@ -267,18 +358,37 @@ const DetailProduct = () => {
                 </Avatar>
                 <div className="flex flex-col md:gap-10 gap-5 p-2 md:items-center">
                   <h1 className="text-xs md:text-lg">{product?.name_seller}</h1>
-                  <Button
-                    variant="ghost"
-                    className="bg-slate-900"
-                    onClick={() => navigate(`/shop/${sellerId}`)}
-                  >
-                    View Shop
-                    <BsShop className="ml-2" />
-                  </Button>
+                  <div className="flex items-center gap-3">
+                    {data?.followShop.includes(product.name_seller) ? (
+                      <Button
+                        variant="ghost"
+                        className="bg-slate-900"
+                        onClick={() => handleUnFollowShop()}
+                      >
+                        UnFollow Shop
+                      </Button>
+                    ) : (
+                      <Button
+                        variant="ghost"
+                        className="bg-slate-900"
+                        onClick={() => handleFollowShop()}
+                      >
+                        + Follow Shop
+                      </Button>
+                    )}
+                    <Button
+                      variant="ghost"
+                      className="bg-slate-900"
+                      onClick={() => navigate(`/shop/${seller?.id}`)}
+                    >
+                      View Shop
+                      <BsShop className="ml-2" />
+                    </Button>
+                  </div>
                 </div>
               </div>
               <div className="flex md:flex-col items-center gap-10">
-                <p>Follower: 100</p>
+                <p>Follower: {seller?.followers}</p>
                 <p>
                   Products:{" "}
                   {
@@ -299,7 +409,7 @@ const DetailProduct = () => {
                     return (
                       <div
                         key={i}
-                        className="flex gap-6 mt-4 text-xs md:text-md"
+                        className="flex gap-6 mt-4 text-xs md:text-lg"
                       >
                         <p>{spek.nameSpek}</p> : <p>{spek.valSpek}</p>
                       </div>
@@ -327,7 +437,7 @@ const DetailProduct = () => {
                   </div>
                   <div className="grow px-4 pt-4">
                     <h2>Username</h2>
-                    <p>2024-01-17</p>
+                    <p className="text-sm">2024-01-17</p>
                     <p>Barangnya Bagus banget</p>
                   </div>
                 </div>

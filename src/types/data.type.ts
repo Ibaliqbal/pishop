@@ -15,6 +15,7 @@ export type GetDataType = {
   image: string;
   role: string;
   timestamp: Timestamp;
-  follower?: number;
+  followers?: number;
+  followShop: string[];
   description_shop?: string;
 };

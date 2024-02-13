@@ -10,7 +10,7 @@ export type Products = {
   phone_seller: number;
   price_product: number;
   category_product: string[];
-  comment_product: any[];
+  comments_product: any[];
   stock_product: number;
   sender_address: string;
   size_product: string[];
@@ -18,6 +18,7 @@ export type Products = {
   createdAt: Timestamp;
   soldout_product: number;
   spek_product: { nameSpek: string; valSpek: string }[];
+  updatedAt?: Timestamp
 };
 
 export const productSchema = z.object({
