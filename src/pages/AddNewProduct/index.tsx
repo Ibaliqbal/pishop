@@ -17,11 +17,6 @@ import { useForm } from "react-hook-form";
 import { TProductSchema, productSchema } from "@/types/products.type";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-type Option = {
-  value: string;
-  label: string;
-};
-
 const AddNewProduct = () => {
   const { data, id } = useGetUserById();
   const { imagesProduct, handleDelete, uploadImage, progress } =

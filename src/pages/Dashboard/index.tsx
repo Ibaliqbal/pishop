@@ -41,8 +41,6 @@ const DashboardUser = ({ data, user, id }: DasboarUserProps) => {
   const location = useLocation();
   return location.pathname === "/profile" ? (
     <Profile data={data} user={user} id={id} />
-  ) : location.pathname === "/profile/cart" ? (
-    <Cart />
   ) : location.pathname === "/profile/transaction" ? (
     <Transaction />
   ) : (
