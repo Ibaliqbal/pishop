@@ -29,14 +29,16 @@ const ProductList = () => {
     if (debouncedVal) {
       return products
         .filter((item) =>
-          item.category_product.some((cate) => filterProduct.includes(cate))
+          item.category_product.some((cate) =>
+            filterProduct.includes(cate.value)
+          )
         )
         .filter((item) =>
           item.name_product.toLowerCase().includes(debouncedVal.toLowerCase())
         );
     } else {
       return products.filter((item) =>
-        item.category_product.some((cate) => filterProduct.includes(cate))
+        item.category_product.some((cate) => filterProduct.includes(cate.value))
       );
     }
   }, [filterProduct, debouncedVal, products]);

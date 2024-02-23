@@ -25,8 +25,8 @@ type FormProductProps = {
   >;
   handleChangeCategory: (option: MultiValue<unknown>) => void;
   handleChangeSizes: (option: MultiValue<unknown>) => void;
-  categoriesProducts: any;
-  sizesProducts: any;
+  categoriesProducts: MultiValue<unknown> | undefined;
+  sizesProducts: MultiValue<unknown> | undefined;
   register: UseFormRegister<TProductSchema>;
   handleSubmitForm: UseFormHandleSubmit<TProductSchema, TProductSchema>;
   onSubmitProduct: (data: TProductSchema) => Promise<void>;

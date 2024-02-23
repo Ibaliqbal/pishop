@@ -205,7 +205,11 @@ function DetailDescription({
               itemStyles={myStyles}
             />
             <p>
-              {(product?.ratings / product?.comments_product.length).toFixed(2)}
+              {product?.comments_product.length > 0
+                ? (product?.ratings / product?.comments_product.length).toFixed(
+                    2
+                  )
+                : 0}
             </p>
           </div>
           |<p>{product?.comments_product.length} Ratings</p> |
@@ -287,20 +291,22 @@ function DetailDescription({
       {product?.size_product.length > 0 ? (
         <div className="flex flex-wrap md:flex-nowrap items-center gap-4">
           <h2>Size : </h2>
-          {product?.size_product.map((size: string, i: number) => (
-            <div key={i} className="flex flex-wrap gap-4">
-              {" "}
-              <button
-                key={i}
-                className={`${
-                  selectSize === size && "bg-white text-black"
-                } transition-all duration-300 ease-in-out px-4 py-2 border-2 border-white rounded-md`}
-                onClick={() => setSelectSize(size)}
-              >
-                {size}
-              </button>
-            </div>
-          ))}
+          {product?.size_product.map(
+            (size: { value: string; label: string }, i: number) => (
+              <div key={i} className="flex flex-wrap gap-4">
+                {" "}
+                <button
+                  key={i}
+                  className={`${
+                    selectSize === size.value && "bg-white text-black"
+                  } transition-all duration-300 ease-in-out px-4 py-2 border-2 border-white rounded-md`}
+                  onClick={() => setSelectSize(size.value)}
+                >
+                  {size.value}
+                </button>
+              </div>
+            )
+          )}
         </div>
       ) : null}
       <div className=" flex items-center gap-3 my-4">

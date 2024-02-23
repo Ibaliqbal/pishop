@@ -17,11 +17,11 @@ export type Products = {
   name_product: string;
   phone_seller: number;
   price_product: number;
-  category_product: string[];
+  category_product: { value: string; label: string }[];
   comments_product: Comment[];
   stock_product: number;
   sender_address: string;
-  size_product: string[];
+  size_product: { value: string; label: string }[];
   product_image: string[];
   createdAt: Timestamp;
   soldout_product: number;

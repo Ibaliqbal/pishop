@@ -5,7 +5,6 @@ import { v4 as uuidv4 } from "uuid";
 
 const useStorageProducts = () => {
   const [imagesProduct, setImagesProduct] = useState<string[]>([]);
-  const [productImages, setProductImages] = useState<string[]>([]);
   const [error, setError] = useState<Error>();
   const [progress, setProgress] = useState<number>(0);
 
@@ -54,7 +53,6 @@ const useStorageProducts = () => {
     uploadImage,
     handleDelete,
     setImagesProduct,
-    productImages,
   };
 };
 

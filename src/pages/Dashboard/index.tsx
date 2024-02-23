@@ -1,7 +1,6 @@
 import DefaultLayout from "@/components/Layout/DefaultLayout";
 import { Navigate, useLocation } from "react-router-dom";
 import Profile from "./Profile";
-import Cart from "./Cart";
 import Transaction from "./Transaction";
 import { DocumentData } from "firebase/firestore";
 import { User } from "firebase/auth";

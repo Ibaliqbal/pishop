@@ -15,7 +15,7 @@ import { useGetProducts } from "@/hooks/useGetProducts";
 import ProductDataTable from "@/features/products/data-table";
 import { columnsProducts } from "@/features/products/columns";
 import Chart from "@/features/chart/Chart";
-import Select, { SingleValue } from "react-select";
+import Select from "react-select";
 
 const selectProfit = [
   { label: "Per 5 days", value: "Per 5 days" },

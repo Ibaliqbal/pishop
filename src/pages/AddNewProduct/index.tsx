@@ -26,8 +26,9 @@ const AddNewProduct = () => {
   const { data, id } = useGetUserById();
   const { imagesProduct, handleDelete, uploadImage, progress } =
     useStorageProducts();
-  const [categoriesProducts, setCategoriesProducts] = useState<any[]>([]);
-  const [sizesProducts, setSizesProducts] = useState<any[]>([]);
+  const [categoriesProducts, setCategoriesProducts] =
+    useState<MultiValue<unknown>>();
+  const [sizesProducts, setSizesProducts] = useState<MultiValue<unknown>>();
   const [errorCate, setErrorCate] = useState<string>("");
   const [spekProduct, setSpekProduct] = useState<
     {
@@ -55,20 +56,15 @@ const AddNewProduct = () => {
     const query = doc(db, "users", id ?? "");
     const idDoc = uuidv4();
     try {
-      if (categoriesProducts.length > 0) {
+      if (categoriesProducts) {
         await setDoc(doc(query, "products", idDoc), {
           ...dataForm,
           price_product: dataForm.price_product,
           name_seller: data?.username,
           product_image: imagesProduct,
           sender_address: data?.address,
-          category_product: categoriesProducts.map(
-            (data: Option) => data.value
-          ),
-          size_product:
-            sizesProducts.length > 0
-              ? sizesProducts.map((data: Option) => data.value)
-              : [],
+          category_product: categoriesProducts,
+          size_product: sizesProducts ? sizesProducts : [],
           phone_seller: data?.phone,
           comments_product: [],
           createdAt: serverTimestamp(),
@@ -83,13 +79,8 @@ const AddNewProduct = () => {
           name_seller: data?.username,
           product_image: imagesProduct,
           sender_address: data?.address,
-          category_product: categoriesProducts.map(
-            (data: Option) => data.value
-          ),
-          size_product:
-            sizesProducts.length > 0
-              ? sizesProducts.map((data: Option) => data.value)
-              : [],
+          category_product: categoriesProducts,
+          size_product: sizesProducts ? sizesProducts : [],
           phone_seller: data?.phone,
           comments_product: [],
           createdAt: serverTimestamp(),
