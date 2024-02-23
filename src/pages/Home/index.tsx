@@ -6,8 +6,7 @@ const Home = () => {
   return (
     <DefaultLayout>
       <section className="p-4">
-          <BannerSlider />
-
+        <BannerSlider />
         <ProductList />
       </section>
     </DefaultLayout>

@@ -1,6 +1,14 @@
 import { Timestamp } from "firebase/firestore";
 import { z } from "zod";
 
+export type Comment = {
+  rating: number;
+  teks: string;
+  name_customer: string;
+  avatar_customer: string;
+  uploadAt: number;
+};
+
 export type Products = {
   id: string;
   name_seller: string;
@@ -10,7 +18,7 @@ export type Products = {
   phone_seller: number;
   price_product: number;
   category_product: string[];
-  comments_product: any[];
+  comments_product: Comment[];
   stock_product: number;
   sender_address: string;
   size_product: string[];
@@ -18,7 +26,8 @@ export type Products = {
   createdAt: Timestamp;
   soldout_product: number;
   spek_product: { nameSpek: string; valSpek: string }[];
-  updatedAt?: Timestamp
+  updatedAt?: Timestamp;
+  ratings: number;
 };
 
 export const productSchema = z.object({

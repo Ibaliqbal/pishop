@@ -26,8 +26,8 @@ const AddNewProduct = () => {
   const { data, id } = useGetUserById();
   const { imagesProduct, handleDelete, uploadImage, progress } =
     useStorageProducts();
-  const [categoriesProducts, setCategoriesProducts] = useState<any>([]);
-  const [sizesProducts, setSizesProducts] = useState<any>([]);
+  const [categoriesProducts, setCategoriesProducts] = useState<any[]>([]);
+  const [sizesProducts, setSizesProducts] = useState<any[]>([]);
   const [errorCate, setErrorCate] = useState<string>("");
   const [spekProduct, setSpekProduct] = useState<
     {
@@ -75,6 +75,7 @@ const AddNewProduct = () => {
           soldout_product: 0,
           image_seller: data?.image,
           spek_product: spekProduct,
+          ratings: 0,
         });
         await setDoc(doc(db, "allproducts", idDoc), {
           ...dataForm,
@@ -95,6 +96,7 @@ const AddNewProduct = () => {
           soldout_product: 0,
           image_seller: data?.image,
           spek_product: spekProduct,
+          ratings: 0,
         });
         toast.success("Product uploaded successfully");
         navigate("/profile");

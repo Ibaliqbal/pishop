@@ -80,27 +80,31 @@ body {
   font-family: "Poppins", sans-serif;
 }
 
-body::-webkit-scrollbar {
+body::-webkit-scrollbar,
+.form-checkout::-webkit-scrollbar {
   width: 5px;
 }
 
 .kum-img::-webkit-scrollbar {
-  height: 5px;
+  height: 8px;
 }
 
 body::-webkit-scrollbar-track,
-.kum-img::-webkit-scrollbar-track {
+.kum-img::-webkit-scrollbar-track,
+.form-checkout::-webkit-scrollbar-track {
   background: #1c1c1c;
 }
 
 body::-webkit-scrollbar-thumb,
-.kum-img::-webkit-scrollbar-thumb {
+.kum-img::-webkit-scrollbar-thumb,
+.form-checkout::-webkit-scrollbar-thumb {
   @apply rounded-lg;
   background: #888;
 }
 
 body::-webkit-scrollbar-thumb:hover,
-.kum-img::-webkit-scrollbar-thumb:hover {
+.kum-img::-webkit-scrollbar-thumb:hover,
+.form-checkout::-webkit-scrollbar-thumb:hover {
   background: #555;
 }
 

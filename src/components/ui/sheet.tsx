@@ -40,7 +40,7 @@ const sheetVariants = cva(
           "inset-x-0 bottom-0 border-t data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom",
         left: "inset-y-0 left-0 h-full w-3/4 border-r data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left sm:max-w-sm",
         right:
-          "inset-y-0 right-0 h-full w-3/4 md:max-w-2xl  border-l data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right sm:max-w-sm",
+          "inset-y-0 right-0 h-full md:w-3/4 w-full  border-l data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right",
       },
     },
     defaultVariants: {
@@ -66,7 +66,7 @@ const SheetContent = React.forwardRef<
     >
       {children}
       <SheetPrimitive.Close className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-secondary">
-        <X className="h-4 w-4" />
+        <X className="h-6 w-6" />
         <span className="sr-only">Close</span>
       </SheetPrimitive.Close>
     </SheetPrimitive.Content>
@@ -78,13 +78,7 @@ const SheetHeader = ({
   className,
   ...props
 }: React.HTMLAttributes<HTMLDivElement>) => (
-  <div
-    className={cn(
-      "flex flex-col space-y-2 text-center sm:text-left grow-0",
-      className
-    )}
-    {...props}
-  />
+  <div className={cn("flex space-y-2 grow-0", className)} {...props} />
 );
 SheetHeader.displayName = "SheetHeader";
 
@@ -92,7 +86,10 @@ const SheetFooter = ({
   className,
   ...props
 }: React.HTMLAttributes<HTMLDivElement>) => (
-  <div className={cn("grid w-full grow-0", className)} {...props} />
+  <div
+    className={cn("grid md:grid-cols-2 w-full grow-0 gap-3", className)}
+    {...props}
+  />
 );
 SheetFooter.displayName = "SheetFooter";
 
@@ -127,8 +124,8 @@ export {
   SheetTrigger,
   SheetClose,
   SheetContent,
-  SheetHeader,
   SheetFooter,
   SheetTitle,
   SheetDescription,
+  SheetHeader,
 };

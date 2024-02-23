@@ -45,6 +45,7 @@ const SDK: string[] = [
   "Seller bertanggung jawab atas keluhan dan pengembalian produk oleh pembeli akibat ketidaksesuaian produk.",
   "Platform berhak membekukan atau menonaktifkan akun seller yang melanggar syarat dan ketentuan.",
   "Perselisihan akan diselesaikan secara musyawarah atau melalui proses hukum jika diperlukan.",
+  "Setiap menerima order akan di kena potong 4%",
 ];
 
 const EditUser = ({ setIsOpenEdit, data, id }: EditUserProps) => {
@@ -135,7 +136,7 @@ const EditUser = ({ setIsOpenEdit, data, id }: EditUserProps) => {
   return (
     <div className="w-full h-full relative flex md:flex-row flex-col justify-evenly p-4 gap-6">
       <IoMdArrowRoundBack
-        className="absolute top-0 left-0 cursor-pointer text-2xl"
+        className="absolute top-0 left-5 cursor-pointer text-2xl"
         onClick={() => setIsOpenEdit((prev) => !prev)}
       />
       {data && (

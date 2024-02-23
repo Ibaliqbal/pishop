@@ -74,9 +74,16 @@ export const columnsProducts: ColumnDef<Products>[] = [
   {
     header: "Phone",
     accessorKey: "phone_seller",
+  },
+  {
+    header: "Stock",
+    accessorKey: "stock_product",
+  },
+  {
+    header: "Created",
     cell: ({ row }) => {
       const product = row.original;
-      return <div>{`0${product.phone_seller}`}</div>;
+      return <span>{product.createdAt.toDate().toDateString()}</span>;
     },
   },
   {
@@ -111,7 +118,7 @@ export const columnsProducts: ColumnDef<Products>[] = [
           const sellerSnap = await getDocs(sellerRef);
 
           // // Hapus doc hasil query di subcollection products
-          await deleteDoc(doc(sellerSnap.docs[0].ref, "products", id))
+          await deleteDoc(doc(sellerSnap.docs[0].ref, "products", id));
 
           // // Hapus doc asli di allproducts
           await deleteDoc(doc(db, "allproducts", id));
@@ -164,7 +171,7 @@ export const columnsProducts: ColumnDef<Products>[] = [
                   key={image}
                   src={image}
                   alt=""
-                  className="md:aspect-[1/1.2] aspect-[1/1.2] object-cover"
+                  className="md:aspect-[1/.9] aspect-[1/.9] object-cover"
                 />
                 <div className="flex max-w-full overflow-y-auto kum-img gap-1">
                   {product?.product_image.map((img: string, i: number) => (

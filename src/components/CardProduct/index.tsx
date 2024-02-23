@@ -10,9 +10,13 @@ type CardProductProps = {
 const CardProduct = ({ data }: CardProductProps) => {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 100 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      transition={{ duration: 1, type: "spring" }}
+      initial={{ opacity: 0, scale: 0.5 }}
+      whileInView={{ opacity: 1, scale: 1 }}
+      transition={{
+        duration: 0.8,
+        type: "spring",
+        delay: Math.round(Math.random() * 5 + 1) * 0.2,
+      }}
       className="md:h-[450px] h-[350px] rounded-md mt-4 col-span-1 md:w-full w-[150px]"
     >
       <Link
@@ -26,7 +30,7 @@ const CardProduct = ({ data }: CardProductProps) => {
             loading="lazy"
             className="w-full lg:h-[250px] h-[200px] rounded-t-md object-cover"
           />
-          <span className="bg-green-600 px-3 text-[10px] md:text-md self-start rounded-r-md">
+          <span className="bg-green-600 px-3 text-[12px] md:text-md self-start rounded-r-md">
             {data.soldout_product} Terjual
           </span>
         </div>

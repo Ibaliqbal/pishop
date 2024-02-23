@@ -24,12 +24,14 @@ interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   className?: string;
+  type: "list" | "transaction";
 }
 
 export default function ProductDataTable<TData, TValue>({
   columns,
   data,
   className,
+  type,
 }: DataTableProps<TData, TValue>) {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const table = useReactTable({
@@ -47,18 +49,22 @@ export default function ProductDataTable<TData, TValue>({
   return (
     <div className={`pt-8 ${className}`}>
       {/* input */}
-      <div className="mb-4">
-        <Input
-          placeholder="Search product..."
-          className="max-w-sm text-black"
-          value={
-            (table.getColumn("name_product")?.getFilterValue() as string) || ""
-          }
-          onChange={(e) => {
-            table.getColumn("name_product")?.setFilterValue(e.target.value);
-          }}
-        />
-      </div>
+      {type === "list" && (
+        <div className="mb-4">
+          <Input
+            placeholder="Search product..."
+            className="max-w-sm text-black"
+            value={
+              (table.getColumn("name_product")?.getFilterValue() as string) ||
+              ""
+            }
+            onChange={(e) => {
+              table.getColumn("name_product")?.setFilterValue(e.target.value);
+            }}
+          />
+        </div>
+      )}
+
       {/* table */}
       <div className="rounded-md border">
         <Table>

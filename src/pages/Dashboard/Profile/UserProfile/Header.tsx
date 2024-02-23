@@ -12,7 +12,7 @@ const HeaderProfile = ({ setIsOpenEdit }: HeaderProfileProps) => {
   const { data, user } = useGetUserById();
   return (
     <header className="w-full flex items-center justify-between gap-6">
-      <Title size="text-3xl" text={`Hello, ${data?.username}`} />
+      <Title size="md:text-3xl text-lg" text={`Hello, ${data?.username}`} />
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}

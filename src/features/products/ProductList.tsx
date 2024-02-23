@@ -39,7 +39,7 @@ const ProductList = () => {
         item.category_product.some((cate) => filterProduct.includes(cate))
       );
     }
-  }, [filterProduct, debouncedVal]);
+  }, [filterProduct, debouncedVal, products]);
   return (
     <section className="grid lg:grid-cols-5 gap-4 min-h-[95dvh] mt-10 text-white">
       <div className="lg:col-span-1 lg:block hidden">

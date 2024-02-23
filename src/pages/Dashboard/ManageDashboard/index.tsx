@@ -10,15 +10,23 @@ import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import Title from "@/components/Title";
 import UserDataTable from "./data-table";
 import { columns } from "./columns";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useGetProducts } from "@/hooks/useGetProducts";
 import ProductDataTable from "@/features/products/data-table";
 import { columnsProducts } from "@/features/products/columns";
+import Chart from "@/features/chart/Chart";
+import Select, { SingleValue } from "react-select";
+
+const selectProfit = [
+  { label: "Per 5 days", value: "Per 5 days" },
+  { label: "Per 5 months", value: "Per 5 months" },
+];
+
 const ManageDashboard = () => {
   const data = useGetUser();
   const products = useGetProducts();
   const navigate = useNavigate();
-  const loacation = useLocation();
+
   return (
     <section className="text-white p-4 flex flex-col gap-4">
       <div className="flex items-center justify-between">
@@ -80,13 +88,28 @@ const ManageDashboard = () => {
           <p>Total Reports</p>
         </div>
       </div>
+      <div className="w-full overflow-y-auto max-w-full mt-10 md:mb-10 mb-16">
+        <div className="w-full flex justify-between  items-center mb-10">
+          <h2 className="text-xl">Your Profit Shop</h2>
+          <Select
+            options={selectProfit}
+            className="text-black w-1/6"
+            defaultValue={selectProfit[0]}
+          />
+        </div>
+        <Chart />
+      </div>
       {location.pathname === "/profile" ? (
         <UserDataTable
           columns={columns}
           data={data?.filter((doc: GetDataType) => doc.role !== "admin")}
         />
       ) : (
-        <ProductDataTable columns={columnsProducts} data={products} />
+        <ProductDataTable
+          columns={columnsProducts}
+          data={products}
+          type="list"
+        />
       )}
     </section>
   );

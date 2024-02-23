@@ -23,6 +23,9 @@ const profileRoute = [
   "/profile/dashboard",
   "/profile/report",
   "/profile/product_manage",
+  "/on_the_way",
+  "/purchase_history",
+  "/gift_rating",
 ];
 
 const Navbar = () => {

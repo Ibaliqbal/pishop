@@ -9,7 +9,11 @@ import PrivateRoute from "./route/PrivateRoute";
 import AddNewProduct from "./pages/AddNewProduct";
 import EditProduct from "./pages/EditProduct";
 import PrivateRouteAdmin from "./route/PrivateRouteAdmin";
-import { CartProdvider } from "./context/cart.context";
+import { CheckoutProvider } from "./context/checkout.context";
+import Payment from "./pages/Payment";
+import Purchase from "./pages/Purchase";
+import OnTheWay from "./pages/OnTheWay";
+import GiftRating from "./pages/GiftRating";
 const ProductDetail = lazy(() => import("@/pages/ProductDetail"));
 const Home = lazy(() => import("@/pages/Home"));
 const ViewShop = lazy(() => import("@/pages/ViewShop"));
@@ -18,7 +22,7 @@ function App() {
   return (
     <>
       <AuthProvider>
-        <CartProdvider>
+        <CheckoutProvider>
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
@@ -89,8 +93,26 @@ function App() {
               }
             />
             <Route path="/edit_product/:id" element={<EditProduct />} />
+            <Route path="/order/:id" element={<Payment />} />
+            <Route
+              path="/purchase_history"
+              element={
+                <PrivateRoute>
+                  <Purchase />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/on_the_way"
+              element={
+                <PrivateRoute>
+                  <OnTheWay />
+                </PrivateRoute>
+              }
+            />
+            <Route path="/gift_rating" element={<GiftRating />} />
           </Routes>
-        </CartProdvider>
+        </CheckoutProvider>
         <Toaster position="top-center" richColors duration={2000} />
       </AuthProvider>
     </>

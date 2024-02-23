@@ -3,8 +3,8 @@ import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { db } from "@/firebaseConfig";
 import { useGetProductsOwner } from "@/hooks/useGetProductsOwner";
-import { DocumentData, doc, getDoc } from "firebase/firestore";
-import { useEffect, useMemo, useState } from "react";
+import { DocumentData, doc, onSnapshot } from "firebase/firestore";
+import { useContext, useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import { FiShoppingBag, FiStar, FiUsers } from "react-icons/fi";
 import { BsArrowLeft } from "react-icons/bs";
@@ -13,27 +13,27 @@ import { category } from "@/components/Fragments/FormProduct";
 import Select, { MultiValue } from "react-select";
 import makeAnimated from "react-select/animated";
 import CardProduct from "@/components/CardProduct";
+import { useGetUserById } from "@/hooks/useGetUserById";
+import { GetDataType } from "@/types/data.type";
+import { handleFollowShop, handleUnFollowShop } from "@/utils/followShop";
+import { AuthContext } from "@/context/auth.context";
+import { toast } from "sonner";
 
 const ViewShop = () => {
   const { id } = useParams();
-  const [seller, setSeller] = useState<DocumentData>();
+  const [seller, setSeller] = useState<DocumentData | GetDataType>();
   const products = useGetProductsOwner(id ?? "");
-  const [loading, setLoading] = useState<boolean>(false);
   const animate = makeAnimated();
   const [filterProducts, setFilterProducts] = useState<MultiValue<unknown>>([]);
+  const { data, id: idUser } = useGetUserById();
+  const auth = useContext(AuthContext);
   useEffect(() => {
-    const getSeller = async () => {
-      try {
-        setLoading(true);
-        const seller = await getDoc(doc(db, "users", id ?? ""));
-        setSeller(seller.data());
-      } catch (error) {
-        console.log(error);
-      } finally {
-        setLoading(false);
-      }
+    const unsubscribe = onSnapshot(doc(db, "users", id ?? ""), (snapshot) => {
+      setSeller({ ...snapshot.data(), id: snapshot.id });
+    });
+    return () => {
+      unsubscribe();
     };
-    id && getSeller();
   }, [id]);
 
   const handleFilter = (option: MultiValue<unknown>) => {
@@ -47,14 +47,14 @@ const ViewShop = () => {
           filterProducts?.some((item: any) => item.value === cate)
         )
       ),
-    [filterProducts]
+    [filterProducts, products]
   );
   return (
     <DefaultLayout>
       <button onClick={() => history.back()} className="text-white text-2xl">
         <BsArrowLeft />
       </button>
-      {loading ? (
+      {seller == undefined ? (
         <div className="loader"></div>
       ) : (
         <section className="p-4 text-white pb-24 lg:pb-4">
@@ -65,15 +65,37 @@ const ViewShop = () => {
               </Avatar>
               <div className="flex items-center justify-between flex-col h-full">
                 <h1>{seller?.username}</h1>
-                <Button variant="ghost" className="bg-slate-900 mt-3">
-                  Follow Shop
-                </Button>
+                {!data?.followShop.includes(seller?.username) ? (
+                  <Button
+                    variant="ghost"
+                    className="bg-slate-900"
+                    onClick={() => {
+                      if (!auth?.user)
+                        return toast.error("You must be logged in");
+                      handleFollowShop(data, seller, idUser);
+                    }}
+                  >
+                    + Follow Shop
+                  </Button>
+                ) : (
+                  <Button
+                    variant="ghost"
+                    className="bg-slate-900"
+                    onClick={() => {
+                      if (!auth?.user)
+                        return toast.error("You must be logged in");
+                      handleUnFollowShop(data, seller, idUser);
+                    }}
+                  >
+                    unfollow
+                  </Button>
+                )}
               </div>
             </div>
             <div className="h-full flex md:flex-col justify-between md:col-span-2 gap-2  flex-wrap md:mt-0 mt-4 text-sm ">
               <p className="flex items-center gap-1 md:gap-3">
                 <FiShoppingBag className="md:text-xl text-sm" />
-                Products : {products.length}
+                Products : {products.length > 0 ? products.length : 0}
               </p>
               <p className="flex items-center gap-1 md:gap-3">
                 <FiStar className="md:text-xl text-sm" />
@@ -81,7 +103,8 @@ const ViewShop = () => {
               </p>
               <p className="flex items-center gap-1 md:gap-3">
                 <FiUsers className="md:text-xl text-sm" />
-                Follower : 100
+                Follower :{" "}
+                {seller ? (seller.followers > 0 ? seller.followers : 0) : 0}
               </p>
             </div>
           </div>
@@ -104,14 +127,14 @@ const ViewShop = () => {
                 onChange={handleFilter}
               />
             </div>
-            <div className="grid lg:grid-cols-5 md:grid-cols-4 grid-cols-2 place-items-center mt-4 gap-4">
+            <div className="grid lg:grid-cols-6 md:grid-cols-4 grid-cols-2 place-items-center mt-4 gap-4">
               {filterProducts.length > 0 ? (
                 filteredProducts.length > 0 ? (
                   filteredProducts.map((product) => {
                     return <CardProduct data={product} key={product.id} />;
                   })
                 ) : (
-                  <p className="lg:col-span-5 md:col-span-4 col-span-2 text-center text-lg">
+                  <p className="lg:col-span-6 md:col-span-4 col-span-2 text-center text-lg">
                     Product not found
                   </p>
                 )
