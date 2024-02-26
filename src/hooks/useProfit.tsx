@@ -24,8 +24,8 @@ export type Profit = {
 export const useProfit = () => {
   const [profits, setProfit] = useState<Profit[]>([]);
   const { id } = useGetUserById();
-  const userRef = doc(db, "users", id ?? "");
   useEffect(() => {
+    const userRef = doc(db, "users", id ?? "");
     const unsubscribe = onSnapshot(
       collection(userRef, "profit"),
       (snapshot) => {
@@ -42,7 +42,7 @@ export const useProfit = () => {
     );
 
     return () => unsubscribe();
-  }, []);
+  }, [id]);
 
   const increaseProfit = async (
     queryUserP: QuerySnapshot<DocumentData, DocumentData>,

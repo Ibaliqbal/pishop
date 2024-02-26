@@ -97,7 +97,7 @@ const RechartsExample = () => {
       return value;
     },
   };
-  return (
+  return profits.length > 0 ? (
     <ResponsiveContainer width="100%" height={400}>
       <AreaChart data={dataChart}>
         <CartesianGrid strokeDasharray="3 3" />
@@ -108,6 +108,8 @@ const RechartsExample = () => {
         <Area type="bump" dataKey="profit" stroke="#16a34a" fill="#16a34a" />
       </AreaChart>
     </ResponsiveContainer>
+  ) : (
+    <p>Loading.....</p>
   );
 };
 
