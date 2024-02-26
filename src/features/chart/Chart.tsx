@@ -8,6 +8,7 @@ import {
   Legend,
   Area,
   AreaChart,
+  ResponsiveContainer,
 } from "recharts";
 import { v4 as uuidv4 } from "uuid";
 
@@ -97,14 +98,16 @@ const RechartsExample = () => {
     },
   };
   return (
-    <AreaChart width={1300} height={400} data={dataChart}>
-      <CartesianGrid strokeDasharray="3 3" />
-      <XAxis dataKey="profitAt" />
-      <YAxis {...yAxis} />
-      <Tooltip />
-      <Legend />
-      <Area type="bump" dataKey="profit" stroke="#16a34a" fill="#16a34a" />
-    </AreaChart>
+    <ResponsiveContainer width="100%" height={400}>
+      <AreaChart data={dataChart}>
+        <CartesianGrid strokeDasharray="3 3" />
+        <XAxis dataKey="profitAt" />
+        <YAxis {...yAxis} />
+        <Tooltip />
+        <Legend />
+        <Area type="bump" dataKey="profit" stroke="#16a34a" fill="#16a34a" />
+      </AreaChart>
+    </ResponsiveContainer>
   );
 };
 
