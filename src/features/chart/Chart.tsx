@@ -12,6 +12,15 @@ import {
 } from "recharts";
 import { v4 as uuidv4 } from "uuid";
 
+const data = [
+  { name: "2017", react: 32, angular: 37, vue: 60 },
+  { name: "2018", react: 42, angular: 42, vue: 54 },
+  { name: "2019", react: 51, angular: 41, vue: 54 },
+  { name: "2020", react: 60, angular: 37, vue: 28 },
+  { name: "2021", react: 51, angular: 31, vue: 27 },
+  { name: "2022", react: 95, angular: 44, vue: 49 },
+];
+
 const RechartsExample = () => {
   const { profits } = useProfit();
   const [dataChart, setDataChart] = useState<
@@ -99,13 +108,13 @@ const RechartsExample = () => {
   };
   return (
     <ResponsiveContainer width="100%" height={400}>
-      <AreaChart data={dataChart}>
+      <AreaChart data={data}>
         <CartesianGrid strokeDasharray="3 3" />
-        <XAxis dataKey="profitAt" />
-        <YAxis {...yAxis} />
+        <XAxis dataKey="name" />
+        <YAxis />
         <Tooltip />
         <Legend />
-        <Area type="bump" dataKey="profit" stroke="#16a34a" fill="#16a34a" />
+        <Area type="bump" dataKey="react" stroke="#16a34a" fill="#16a34a" />
       </AreaChart>
     </ResponsiveContainer>
   );
